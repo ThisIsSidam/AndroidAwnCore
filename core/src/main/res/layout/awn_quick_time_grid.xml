@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Expanded-notification content view for NotificationLayout.QuickTimeGrid.
-  8 static cells (4x2), matching the app's in-app quick-time-table sheet shape.
+  13 static cells: a 4-wide x 3-row grid (0..11, matching the app's in-app
+  quick-time-table sheet, which has 4 absolute-time + 8 duration options) plus
+  one full-width trailing cell (12) for a distinct action such as "Done".
   Cells with no corresponding actionButton are hidden at build time (see
-  NotificationBuilder#setQuickTimeGridLayout), not removed, so the grid stays 4-wide.
+  NotificationBuilder#setQuickTimeGridLayout), not removed, so the grid keeps
+  its shape when a caller sends fewer buttons.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apis/res/android"
     android:layout_width="match_parent"
@@ -19,69 +22,34 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/awn_quick_time_button_0"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_0" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_1" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_2" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_3" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
 
-        <Button
-            android:id="@+id/awn_quick_time_button_1"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="" />
+    </LinearLayout>
 
-        <Button
-            android:id="@+id/awn_quick_time_button_2"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/awn_quick_time_button_3"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_4" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_5" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_6" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_7" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button android:id="@+id/awn_quick_time_button_8" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_9" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_10" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
+        <Button android:id="@+id/awn_quick_time_button_11" style="?android:attr/borderlessButtonStyle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minWidth="0dp" android:minHeight="0dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textAllCaps="false" android:textSize="12sp" android:ellipsize="end" android:maxLines="1" android:text="" />
 
     </LinearLayout>
 
@@ -91,65 +59,17 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/awn_quick_time_button_4"
+            android:id="@+id/awn_quick_time_button_12"
             style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:paddingTop="6dp"
             android:paddingBottom="6dp"
             android:textAllCaps="false"
-            android:textSize="12sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="" />
-
-        <Button
-            android:id="@+id/awn_quick_time_button_5"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="" />
-
-        <Button
-            android:id="@+id/awn_quick_time_button_6"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="" />
-
-        <Button
-            android:id="@+id/awn_quick_time_button_7"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:textAllCaps="false"
-            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textSize="13sp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="" />

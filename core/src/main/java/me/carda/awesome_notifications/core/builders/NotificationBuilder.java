@@ -1314,6 +1314,9 @@ public class NotificationBuilder {
             R.id.awn_quick_time_button_2, R.id.awn_quick_time_button_3,
             R.id.awn_quick_time_button_4, R.id.awn_quick_time_button_5,
             R.id.awn_quick_time_button_6, R.id.awn_quick_time_button_7,
+            R.id.awn_quick_time_button_8, R.id.awn_quick_time_button_9,
+            R.id.awn_quick_time_button_10, R.id.awn_quick_time_button_11,
+            R.id.awn_quick_time_button_12,
         };
 
         List<NotificationButtonModel> buttons = notificationModel.actionButtons;
