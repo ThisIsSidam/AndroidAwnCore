@@ -8,7 +8,8 @@ public enum NotificationLayout implements SafeEnum {
     ProgressBar("ProgressBar"),
     Messaging("Messaging"),
     MessagingGroup("MessagingGroup"),
-    MediaPlayer("MediaPlayer");
+    MediaPlayer("MediaPlayer"),
+    QuickTimeGrid("QuickTimeGrid");
 
     private final String safeName;
     NotificationLayout(final String safeName){
@@ -50,6 +51,9 @@ public enum NotificationLayout implements SafeEnum {
         }
         if (SafeEnum.charMatches(reference, stringLength, 0, 'p')){
             return ProgressBar;
+        }
+        if (SafeEnum.charMatches(reference, stringLength, 0, 'q')){
+            return QuickTimeGrid;
         }
         return null;
     }

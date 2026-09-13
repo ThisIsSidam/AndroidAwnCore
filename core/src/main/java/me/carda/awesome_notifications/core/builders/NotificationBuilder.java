@@ -24,6 +24,8 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.Spanned;
+import android.view.View;
+import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,6 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import me.carda.awesome_notifications.core.AwesomeNotifications;
 import me.carda.awesome_notifications.core.Definitions;
+import me.carda.awesome_notifications.core.R;
 import me.carda.awesome_notifications.core.completion_handlers.NotificationThreadCompletionHandler;
 import me.carda.awesome_notifications.core.enumerators.ActionType;
 import me.carda.awesome_notifications.core.enumerators.GroupSort;
@@ -1018,6 +1021,62 @@ public class NotificationBuilder {
 
     @SuppressLint("WrongConstant")
     @NonNull
+    // Shared by createActionButtons (native action row) and setQuickTimeGridLayout (custom
+    // RemoteViews grid), so both dispatch taps through the identical NotificationActionReceiver
+    // intent shape.
+    private PendingIntent buildActionPendingIntent(
+            Context context,
+            Intent originalIntent,
+            NotificationModel notificationModel,
+            NotificationChannelModel channel,
+            NotificationButtonModel buttonProperties
+    ) {
+        ActionType actionType = buttonProperties.actionType;
+
+        Intent actionIntent = buildNotificationIntentFromNotificationModel(
+            context,
+            originalIntent,
+            Definitions.NOTIFICATION_BUTTON_ACTION_PREFIX + "_" + buttonProperties.key,
+            notificationModel,
+            channel,
+            buttonProperties.actionType,
+            actionType == ActionType.Default ?
+                getMainTargetClass(context):
+                AwesomeNotifications.actionReceiverClass
+        );
+
+        if(buttonProperties.actionType == ActionType.Default)
+                actionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        actionIntent.putExtra(Definitions.NOTIFICATION_AUTO_DISMISSIBLE, buttonProperties.autoDismissible);
+        actionIntent.putExtra(Definitions.NOTIFICATION_AUTHENTICATION_REQUIRED, buttonProperties.isAuthenticationRequired);
+        actionIntent.putExtra(Definitions.NOTIFICATION_SHOW_IN_COMPACT_VIEW, buttonProperties.showInCompactView);
+        actionIntent.putExtra(Definitions.NOTIFICATION_ENABLED, buttonProperties.enabled);
+        actionIntent.putExtra(Definitions.NOTIFICATION_BUTTON_KEY, buttonProperties.key);
+        actionIntent.putExtra(Definitions.NOTIFICATION_ACTION_TYPE,
+                buttonProperties.actionType != null ?
+                        buttonProperties.actionType.toString() : ActionType.Default.toString());
+
+        if (!buttonProperties.enabled) return null;
+
+        return actionType == ActionType.Default ?
+            PendingIntent.getActivity(
+                    context,
+                    notificationModel.content.id,
+                    actionIntent,
+                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ?
+                            PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT :
+                            PendingIntent.FLAG_UPDATE_CURRENT)
+                :
+            PendingIntent.getBroadcast(
+                    context,
+                    notificationModel.content.id,
+                    actionIntent,
+                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ?
+                            PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT :
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
     public void createActionButtons(
             Context context,
             Intent originalIntent,
@@ -1026,6 +1085,9 @@ public class NotificationBuilder {
             NotificationCompat.Builder builder
     ){
         if (ListUtils.isNullOrEmpty(notificationModel.actionButtons)) return;
+
+        // QuickTimeGrid renders these same actionButtons itself, as RemoteViews grid cells.
+        if (notificationModel.content.notificationLayout == NotificationLayout.QuickTimeGrid) return;
 
         for (NotificationButtonModel buttonProperties : notificationModel.actionButtons) {
 
@@ -1039,51 +1101,8 @@ public class NotificationBuilder {
             ActionType actionType = buttonProperties.actionType;
             String buttonLabel = buttonProperties.label;
 
-            Intent actionIntent = buildNotificationIntentFromNotificationModel(
-                context,
-                originalIntent,
-                Definitions.NOTIFICATION_BUTTON_ACTION_PREFIX + "_" + buttonProperties.key,
-                notificationModel,
-                channel,
-                buttonProperties.actionType,
-                actionType == ActionType.Default ?
-                    getMainTargetClass(context):
-                    AwesomeNotifications.actionReceiverClass
-            );
-
-            if(buttonProperties.actionType == ActionType.Default)
-                    actionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            actionIntent.putExtra(Definitions.NOTIFICATION_AUTO_DISMISSIBLE, buttonProperties.autoDismissible);
-            actionIntent.putExtra(Definitions.NOTIFICATION_AUTHENTICATION_REQUIRED, buttonProperties.isAuthenticationRequired);
-            actionIntent.putExtra(Definitions.NOTIFICATION_SHOW_IN_COMPACT_VIEW, buttonProperties.showInCompactView);
-            actionIntent.putExtra(Definitions.NOTIFICATION_ENABLED, buttonProperties.enabled);
-            actionIntent.putExtra(Definitions.NOTIFICATION_BUTTON_KEY, buttonProperties.key);
-            actionIntent.putExtra(Definitions.NOTIFICATION_ACTION_TYPE,
-                    buttonProperties.actionType != null ?
-                            buttonProperties.actionType.toString() : ActionType.Default.toString());
-
-            PendingIntent actionPendingIntent = null;
-            if (buttonProperties.enabled) {
-
-                actionPendingIntent =
-                    actionType == ActionType.Default ?
-                        PendingIntent.getActivity(
-                                context,
-                                notificationModel.content.id,
-                                actionIntent,
-                                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ?
-                                        PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT :
-                                        PendingIntent.FLAG_UPDATE_CURRENT)
-                            :
-                        PendingIntent.getBroadcast(
-                                context,
-                                notificationModel.content.id,
-                                actionIntent,
-                                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ?
-                                        PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT :
-                                        PendingIntent.FLAG_UPDATE_CURRENT);
-            }
+            PendingIntent actionPendingIntent =
+                buildActionPendingIntent(context, originalIntent, notificationModel, channel, buttonProperties);
 
             int iconResource = 0;
             if (!stringUtils.isNullOrEmpty(buttonProperties.icon)) {
@@ -1263,6 +1282,11 @@ public class NotificationBuilder {
                     setProgressLayout(notificationModel, builder);
                     break;
 
+                case QuickTimeGrid:
+                    if (setQuickTimeGridLayout(context, originalIntent, notificationModel, channelModel, builder))
+                        return;
+                    break;
+
                 case Default:
                 default:
                     break;
@@ -1270,6 +1294,54 @@ public class NotificationBuilder {
         } catch (Exception e) {
             Logger.e(TAG, e.getMessage());
         }
+    }
+
+    // Renders notificationModel.actionButtons as a static grid of clickable cells in the
+    // expanded notification view, instead of the OS-limited (~3 visible) native action row.
+    // Each cell reuses the exact same PendingIntent construction as a normal action button,
+    // so taps are dispatched through the unmodified NotificationActionReceiver -> Dart pipeline.
+    private Boolean setQuickTimeGridLayout(
+            Context context,
+            Intent originalIntent,
+            NotificationModel notificationModel,
+            NotificationChannelModel channel,
+            NotificationCompat.Builder builder
+    ) {
+        if (ListUtils.isNullOrEmpty(notificationModel.actionButtons)) return false;
+
+        int[] cellIds = new int[] {
+            R.id.awn_quick_time_button_0, R.id.awn_quick_time_button_1,
+            R.id.awn_quick_time_button_2, R.id.awn_quick_time_button_3,
+            R.id.awn_quick_time_button_4, R.id.awn_quick_time_button_5,
+            R.id.awn_quick_time_button_6, R.id.awn_quick_time_button_7,
+        };
+
+        List<NotificationButtonModel> buttons = notificationModel.actionButtons;
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.awn_quick_time_grid);
+
+        for (int i = 0; i < cellIds.length; i++) {
+            NotificationButtonModel buttonProperties = i < buttons.size() ? buttons.get(i) : null;
+
+            if (buttonProperties == null || buttonProperties.label == null) {
+                remoteViews.setViewVisibility(cellIds[i], View.GONE);
+                continue;
+            }
+
+            remoteViews.setViewVisibility(cellIds[i], View.VISIBLE);
+            remoteViews.setTextViewText(cellIds[i], buttonProperties.label);
+
+            PendingIntent actionPendingIntent =
+                buildActionPendingIntent(context, originalIntent, notificationModel, channel, buttonProperties);
+
+            if (actionPendingIntent != null) {
+                remoteViews.setOnClickPendingIntent(cellIds[i], actionPendingIntent);
+            }
+        }
+
+        builder.setCustomBigContentView(remoteViews);
+        builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+
+        return true;
     }
 
     private Boolean setBigPictureLayout(Context context, NotificationModel notificationModel, NotificationCompat.Builder builder) {
